@@ -1,66 +1,47 @@
 class Grid < Array
-  def initialize(board)
-    @board = board
-    @new_board = []
-    #array of arrays
-  end
-
-  def location_check(cell_index, row_index)
-    height = @board.length
-    width = @board[0].length
-    true if cell_index > 0 && cell_index < width && row_index > 0 && row_index < height
-  end
-
-  def alive?(arg)
-    if arg == 0
-      false
-    else
-      true
-    end
-  end
-
-  def change_state(current_cell_state, live)
-    if current_cell_state && live < 2
-      false
-    elsif current_cell_state && live >= 2 && live <=3
-      true
-    elsif current_cell_state && live > 3
-      false
-    elsif current_cell_state == false && live == 3
-      true
-    end
-  end
-
-  def build_new_board(current_cell_state, row_index, cell_index)
-    if current_cell_state
-      @new_board[row_index, cell_index] = 1
-    else
-      @new_board[row_index, cell_index] = 0
-    end
-    @new_board
-  end
-
-  def check_neighbors
-    live = 0
-    @board.each_with_index do |row, row_index|
-      row.each_with_index do |cell, cell_index|
-        current_cell_state = alive?(@board[row_index][cell_index])
-        live += 1 if alive?(@board[cell_index][(row_index) +1]) && location_check(cell_index, ((row_index) +1))
-        live += 1 if alive?(@board[cell_index][(row_index) -1]) && location_check(cell_index, ((row_index) -1))
-        live += 1 if alive?(@board[(cell_index) +1][row_index]) && location_check(((cell_index) +1), row_index)
-        live += 1 if alive?(@board[(cell_index) -1][row_index]) && location_check(((cell_index) -1), row_index)
-        live += 1 if alive?(@board[(cell_index) +1][(row_index) +1]) && location_check(((cell_index) +1), ((row_index) +1))
-        live += 1 if alive?(@board[(cell_index) -1][(row_index) -1]) && location_check(((cell_index) -1), ((row_index) -1))
-        live += 1 if alive?(@board[(cell_index) -1][(row_index) +1]) && location_check(((cell_index) -1), ((row_index) +1))
-        live += 1 if alive?(@board[(cell_index) +1][(row_index) -1]) && location_check(((cell_index) +1), ((row_index) -1))
-
-        current_cell_state = change_state(current_cell_state, live)
-        build_new_board(current_cell_state, row_index, cell_index)
-      end
-    end
+  def initialize(array)
+    @array = array
+    @width = array.first.length
+    @height = array.length
+    @new_array = Array.new(@array.length) { Array.new(@array.first.length) }
+    @live = 0
   end
 
   def tick
-    check_neighbors
+    @array.each_with_index do |row, index|
+      p index
+      row.each_with_index do |cell, cell_index|
+        cell_value = cell
+        if cell_value
+          look_around_alive(index, cell_index)
+        end
+
+      end
+    end
+
+
   end
+
+  def edges?(index, cell_index)
+    if index <= @height && index >= 0 && cell_index <= @width && cell_index >= 0
+      true
+    end
+  end
+
+  def look_around_alive(row_index, cell_index)
+    live = 0
+    live += 1 if @array[cell_index][row_index + 1] == 1
+    live += 1 if @array[cell_index][row_index - 1] == 1
+    live += 1 if @array[cell_index + 1][row_index] == 1
+    live += 1 if @array[cell_index - 1][row_index] == 1
+    live += 1 if @array[cell_index + 1][row_index + 1] == 1
+    live += 1 if @array[cell_index - 1][row_index - 1] == 1
+    live += 1 if @array[cell_index - 1][row_index + 1] == 1
+    live += 1 if @array[cell_index + 1][row_index - 1] == 1
+    @live = live
+  end
+# it's returning the correct value for arrays and each with index, so now I need to manipulate the data correctly
 end
+
+
+
